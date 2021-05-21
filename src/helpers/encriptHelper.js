@@ -1,8 +1,7 @@
 const bcrypt = require("bcrypt");
-const saltRounds = 10;
 
 const encriptText = async (text) => {
-  return await bcrypt.hash(text, saltRounds);
+  return await bcrypt.hash(text, process.env.SALTROUNDS);
 };
 
 const compareText = async (text, hash) => {
