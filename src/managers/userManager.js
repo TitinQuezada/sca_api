@@ -1,23 +1,68 @@
 const User = require("../database/models/userModel");
 const basicOperationResult = require("../helpers/basicOperationResult");
+const encriptHelper = require("../helpers/encriptHelper");
 
 const createUser = async (user) => {
   try {
-    const errorMessage = validateUserToCreate(user);
+    const errorMessage = await validateUserToCreate(user);
 
     if (errorMessage) {
       return basicOperationResult.fail(errorMessage);
     }
 
-    await new User(user).save();
+    const userToCreate = await buildUser(user);
+
+    await new User(userToCreate).save();
 
     return basicOperationResult.ok();
-  } catch (ex) {
-    return basicOperationResult.fail(ex);
+  } catch (exception) {
+    return basicOperationResult.fail(exception);
   }
 };
 
-const validateUserToCreate = ({
+const buildUser = async (user) => {
+  user.password = await encriptHelper.encriptText(user.password);
+
+  return user;
+};
+
+const validateUserToCreate = async (user) => {
+  const userRequiredPropertiesMessage = validateUserRequiredProperties(user);
+
+  if (userRequiredPropertiesMessage) {
+    return userRequiredPropertiesMessage;
+  }
+
+  const userUniquePropertiesMessage = await validateUserUniqueProperties(user);
+
+  if (userUniquePropertiesMessage) {
+    return userUniquePropertiesMessage;
+  }
+};
+
+const validateUserUniqueProperties = async (user) => {
+  const users = await User.find({
+    $or: [{ username: user.username }, { email: user.email }],
+  }).exec();
+
+  const usersWithSameUsername = users.find(
+    (userResult) => userResult.username == user.username
+  );
+
+  if (usersWithSameUsername) {
+    return `El nombre de usuario ${user.username} ya existe`;
+  }
+
+  const usersWithSameEmail = users.find(
+    (userResult) => userResult.email == user.email
+  );
+
+  if (usersWithSameEmail) {
+    return `El correo eléctronico ${user.email} ya existe`;
+  }
+};
+
+const validateUserRequiredProperties = ({
   names,
   lastnames,
   username,
