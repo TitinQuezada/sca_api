@@ -1,6 +1,7 @@
 const User = require("../database/models/userModel");
 const basicOperationResult = require("../helpers/basicOperationResult");
 const encriptHelper = require("../helpers/encriptHelper");
+const Rol = require("../database/models/rolModel");
 
 const createUser = async (user) => {
   try {
@@ -22,6 +23,7 @@ const createUser = async (user) => {
 
 const buildUser = async (user) => {
   user.password = await encriptHelper.encriptText(user.password);
+  user.rolId = await getCustomerRoleId();
 
   return user;
 };
@@ -68,7 +70,6 @@ const validateUserRequiredProperties = ({
   username,
   email,
   password,
-  rolId,
 }) => {
   if (!names) {
     return "Los nombres del usuario es requerido";
@@ -89,10 +90,12 @@ const validateUserRequiredProperties = ({
   if (!password) {
     return "La contraseña del usuario es requerida";
   }
+};
 
-  if (!rolId) {
-    return "El rol del usuario es requerido";
-  }
+const getCustomerRoleId = async () => {
+  const rol = await Rol.findOne({ code: "Customer" }).exec();
+
+  return rol._id;
 };
 
 module.exports = { createUser };

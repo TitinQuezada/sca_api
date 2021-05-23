@@ -10,6 +10,15 @@ const getAll = async () => {
   }
 };
 
+const getByUserId = async (userId) => {
+  try {
+    const studyCenters = await StudyCenter.find({ userId }).exec();
+    return operationResult.ok(studyCenters);
+  } catch (exception) {
+    return operationResult.fail(exception);
+  }
+};
+
 const create = async (studyCenter, userId) => {
   try {
     const errorMessage = validateStudyCenter(studyCenter);
@@ -40,4 +49,4 @@ const validateStudyCenter = ({ name, career }) => {
   }
 };
 
-module.exports = { getAll, create };
+module.exports = { create, getByUserId, getAll };

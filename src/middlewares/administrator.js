@@ -1,7 +1,8 @@
 const httpStatusCodes = require("../enums/httpStatusCodes");
-var jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
+const Rol = require("../database/models/rolModel");
 
-const authenticate = (request, response, next) => {
+const administrator = async (request, response, next) => {
   try {
     const unauthorizeMessage = "Unauthorize";
 
@@ -13,8 +14,9 @@ const authenticate = (request, response, next) => {
       const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
 
       request.userId = decodedToken.data.id;
+      const administratorRolId = await getAdministratorRoleId();
 
-      return decodedToken
+      return decodedToken?.data.rolId == administratorRolId
         ? next()
         : response.status(httpStatusCodes.unauthorize).send(unauthorizeMessage);
     }
@@ -27,4 +29,10 @@ const authenticate = (request, response, next) => {
   }
 };
 
-module.exports = authenticate;
+const getAdministratorRoleId = async () => {
+  const rol = await Rol.findOne({ code: "Admin" }).exec();
+
+  return rol._id;
+};
+
+module.exports = administrator;

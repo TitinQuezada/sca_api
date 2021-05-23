@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
     rolId: {
-      type: Number,
+      type: String,
       required: true,
     },
     email: {

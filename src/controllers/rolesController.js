@@ -1,23 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const studyCenterManager = require("../managers/studyCentersManager");
 const httpStatusCodes = require("../enums/httpStatusCodes");
-const administrator = require("../middlewares/administrator");
+const rolManager = require("../managers/rolManager");
 
-router.get("/all", administrator, async ({ userId }, response) => {
-  const operationResult = await studyCenterManager.getByUserId(userId);
-
-  if (operationResult.error) {
-    return response
-      .status(httpStatusCodes.badRequest)
-      .send(operationResult.error);
-  }
-
-  return response.status(httpStatusCodes.ok).json(operationResult.entity);
-});
-
-router.get("/", async ({ userId }, response) => {
-  const operationResult = await studyCenterManager.getByUserId(userId);
+router.get("/", async ({}, response) => {
+  const operationResult = await rolManager.getAll();
 
   if (operationResult.error) {
     return response
@@ -28,8 +15,32 @@ router.get("/", async ({ userId }, response) => {
   return response.status(httpStatusCodes.ok).json(operationResult.entity);
 });
 
-router.post("/", async ({ body, userId }, response) => {
-  const operationResult = await studyCenterManager.create(body, userId);
+router.get("/:id", async ({ params }, response) => {
+  const operationResult = await rolManager.getById(params.id);
+
+  if (operationResult.error) {
+    return response
+      .status(httpStatusCodes.badRequest)
+      .send(operationResult.error);
+  }
+
+  return response.status(httpStatusCodes.ok).json(operationResult.entity);
+});
+
+router.get("/code/:code", async ({ params }, response) => {
+  const operationResult = await rolManager.getByCode(params.code);
+
+  if (operationResult.error) {
+    return response
+      .status(httpStatusCodes.badRequest)
+      .send(operationResult.error);
+  }
+
+  return response.status(httpStatusCodes.ok).json(operationResult.entity);
+});
+
+router.post("/", async ({ body }, response) => {
+  const operationResult = await rolManager.create(body);
 
   if (operationResult.error) {
     return response
