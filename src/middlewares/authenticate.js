@@ -1,5 +1,5 @@
 const httpStatusCodes = require("../enums/httpStatusCodes");
-var jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 
 const authenticate = (request, response, next) => {
   try {

@@ -4,8 +4,8 @@ const studyCenterManager = require("../managers/studyCentersManager");
 const httpStatusCodes = require("../enums/httpStatusCodes");
 const administrator = require("../middlewares/administrator");
 
-router.get("/all", administrator, async ({ userId }, response) => {
-  const operationResult = await studyCenterManager.getByUserId(userId);
+router.get("/all", administrator, async ({}, response) => {
+  const operationResult = await studyCenterManager.getAll();
 
   if (operationResult.error) {
     return response
